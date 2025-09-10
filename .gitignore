@@ -1,0 +1,13 @@
+# Folderul cu toate pachetele instalate
+node_modules/
+
+# Fișiere temporare
+npm-debug.log
+yarn-error.log
+
+# Setările VS Code locale (opțional)
+.vscode/
+
+# Fișier pentru variabile de mediu
+.env
+
