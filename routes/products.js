@@ -27,6 +27,18 @@ router.get("/details/:id", (req, res) => {
   res.json(product);
 });
 
+// Nivel 8: căutare
+router.get("/search", (req, res) => {
+  const { name, minPrice, maxPrice } = req.query;
+  let result = products;
+
+  if (name) result = result.filter(p => p.name.toLowerCase().includes(name.toLowerCase()));
+  if (minPrice) result = result.filter(p => p.price >= parseFloat(minPrice));
+  if (maxPrice) result = result.filter(p => p.price <= parseFloat(maxPrice));
+
+  res.json(result);
+});
+
 
 
 module.exports = router;
