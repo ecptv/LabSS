@@ -37,4 +37,22 @@ router.put("/edit/:id", (req, res) => {
   res.json({ success: true, product: products[index] });
 });
 
+// Nivel 10: raport accesibil doar Admin
+function checkRole(requiredRole) {
+  return (req, res, next) => {
+    const userRole = req.headers["role"]; // citim header-ul "role"
+
+    if (userRole !== requiredRole) {
+      return res.status(403).json({ error: "Access forbidden" });
+    }
+
+    next(); // dacă rolul e corect → continuă
+  };
+}
+
+// ruta /reports doar pentru admin
+router.get("/reports", checkRole("admin"), (req, res) => {
+  res.json({ message: "Raport accesat cu succes" });
+});
+
 module.exports = router;
