@@ -1,14 +1,10 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
-require("dotenv").config();
 
 const PORT = process.env.PORT || 3000;
 
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
-});
-
-
+// Middleware pentru JSON
 app.use(express.json());
 
 // Lista statică (Nivel 5)
@@ -28,4 +24,25 @@ const products = [
 // Nivel 5: GET /list
 app.get("/list", (req, res) => {
   res.json(products);
+});
+
+// Nivel 6: GET /details/:id
+app.get("/details/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const product = products.find(p => p.id === id);
+
+  if (!product) {
+    return res.status(404).json({ error: "Element not found" });
+  }
+  res.json(product);
+});
+
+// Middleware pentru rute inexistente (404 JSON)
+app.use((req, res) => {
+  res.status(404).json({ error: "Route not found" });
+});
+
+// Pornirea serverului
+app.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
