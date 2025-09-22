@@ -25,6 +25,16 @@ function checkRole(role) {
   };
 }
 
+// Nivel 9: editare
+router.put("/edit/:id", (req, res) => {
+  const id = parseInt(req.params.id);
+  const { name, price } = req.body;
+  const index = products.findIndex(p => p.id === id);
 
+  if (index === -1) return res.status(404).json({ error: "Not found" });
+
+  products[index] = { id, name, price };
+  res.json({ success: true, product: products[index] });
+});
 
 module.exports = router;
