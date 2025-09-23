@@ -28,16 +28,18 @@ router.get("/details/:id", (req, res) => {
 });
 
 // Nivel 8: căutare
+// GET /products/search?name=telefon
 router.get("/search", (req, res) => {
-  const { name, minPrice, maxPrice } = req.query;
+  const { name } = req.query;
   let result = products;
 
-  if (name) result = result.filter(p => p.name.toLowerCase().includes(name.toLowerCase()));
-  if (minPrice) result = result.filter(p => p.price >= parseFloat(minPrice));
-  if (maxPrice) result = result.filter(p => p.price <= parseFloat(maxPrice));
+  if (name) {
+    result = result.filter(p => p.name.toLowerCase().includes(name.toLowerCase()));
+  }
 
   res.json(result);
 });
+
 
 
 
