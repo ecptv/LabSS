@@ -3,7 +3,7 @@ const router = express.Router();
 
 const products = [
   { id: 1, name: "Produs A", price: 10 },
-  { id: 2, name: "Produs B", price: 20 },
+  { id: 2, name: "Apple B", price: 20 },
   { id: 3, name: "Produs C", price: 30 },
   { id: 4, name: "Produs D", price: 40 },
   { id: 5, name: "Produs E", price: 50 },
@@ -27,20 +27,33 @@ router.get("/details/:id", (req, res) => {
   res.json(product);
 });
 
-// Nivel 8: căutare
-// GET /products/search?name=telefon
-router.get("/search", (req, res) => {
+// middleware pentru majuscule
+function uppercaseName(req, res, next) {
+  if (res.locals.result) {
+    res.locals.result = res.locals.result.map(p => ({
+      ...p,
+      name: p.name.toUpperCase()
+    }));
+  }
+  next();
+}
+
+// Nivel 8: căutare + majuscule
+// GET /products/search?name=apple
+router.get("/search", (req, res, next) => {
   const { name } = req.query;
   let result = products;
 
   if (name) {
-    result = result.filter(p => p.name.toLowerCase().includes(name.toLowerCase()));
+    result = result.filter(p =>
+      p.name.toLowerCase().includes(name.toLowerCase())
+    );
   }
 
-  res.json(result);
+  res.locals.result = result; // trimitem datele spre middleware
+  next();
+}, uppercaseName, (req, res) => {
+  res.json(res.locals.result);
 });
-
-
-
 
 module.exports = router;
