@@ -1,58 +1,59 @@
 const express = require("express");
 const router = express.Router();
 
-const products = [
-  { id: 1, name: "Produs A", price: 10 },
-  { id: 2, name: "Produs B", price: 20 },
-  { id: 3, name: "Produs C", price: 30 },
-  { id: 4, name: "Produs D", price: 40 },
-  { id: 5, name: "Produs E", price: 50 },
-  { id: 6, name: "Produs F", price: 60 },
-  { id: 7, name: "Produs G", price: 70 },
-  { id: 8, name: "Produs H", price: 80 },
-  { id: 9, name: "Produs I", price: 90 },
-  { id: 10, name: "Produs J", price: 100 }
+// --- simularea a niște date ---
+let news = [
+  { id: 1, title: "Reciclarea plasticului", content: "Plasticul trebuie colectat separat." },
+  { id: 2, title: "Campanie sticlă", content: "Sticla se depune în containerele verzi." }
 ];
 
-// Middleware roluri
-function checkRole(role) {
+let workers = [
+  { id: 1, name: "Ion Popescu", active: true },
+  { id: 2, name: "Maria Ionescu", active: true }
+];
+
+// --- middleware roluri ---
+function checkRole(requiredRole) {
   return (req, res, next) => {
-    const userRole = req.headers["role"];
-    if (userRole !== role) {
+    const userRole = req.headers["role"]; // ex: role=admin
+    if (userRole !== requiredRole) {
       return res.status(403).json({ error: "Access forbidden" });
     }
     next();
   };
 }
 
-// Nivel 9: editare
-router.put("/edit/:id", (req, res) => {
-  const id = parseInt(req.params.id);
-  const { name, price } = req.body;
-  const index = products.findIndex(p => p.id === id);
-
-  if (index === -1) return res.status(404).json({ error: "Not found" });
-
-  products[index] = { id, name, price };
-  res.json({ success: true, product: products[index] });
+// --- gestionare articole/news ---
+router.post("/news", checkRole("admin"), (req, res) => {
+  const { title, content } = req.body;
+  const newArticle = { id: news.length + 1, title, content };
+  news.push(newArticle);
+  res.status(201).json(newArticle);
 });
 
-// Nivel 10: raport accesibil doar Admin
-function checkRole(requiredRole) {
-  return (req, res, next) => {
-    const userRole = req.headers["role"]; // citim header-ul "role"
+router.delete("/news/:id", checkRole("admin"), (req, res) => {
+  const id = parseInt(req.params.id);
+  news = news.filter(n => n.id !== id);
+  res.json({ message: `Articolul ${id} a fost șters.` });
+});
 
-    if (userRole !== requiredRole) {
-      return res.status(403).json({ error: "Access forbidden" });
-    }
+// --- gestionare lucrători ---
+router.put("/workers/ban/:id", checkRole("admin"), (req, res) => {
+  const id = parseInt(req.params.id);
+  const worker = workers.find(w => w.id === id);
+  if (!worker) return res.status(404).json({ error: "Worker not found" });
 
-    next(); // dacă rolul e corect → continuă
-  };
-}
+  worker.active = false;
+  res.json({ message: `${worker.name} a fost banat.` });
+});
 
-// ruta /reports doar pentru admin
+// --- rapoarte ---
 router.get("/reports", checkRole("admin"), (req, res) => {
-  res.json({ message: "Raport accesat cu succes" });
+  res.json({
+    workersActive: workers.filter(w => w.active).length,
+    newsCount: news.length,
+    message: "Raport generat cu succes."
+  });
 });
 
 module.exports = router;
