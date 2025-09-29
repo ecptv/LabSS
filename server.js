@@ -21,10 +21,14 @@ module.exports = checkRole;
 //rutele
 const productsRoutes = require("./routes/products");
 const adminRoutes = require("./routes/admin");
+const userRoutes = require("./routes/users");
+const workerRoutes = require("./routes/workers");
 
 // modulele
 app.use("/products", productsRoutes);
 app.use("/admin", adminRoutes);
+app.use("/users", userRoutes);
+app.use("/workers", workerRoutes);
 
 app.listen(port, () => {
   console.log(`Server running at http://localhost:${port}`);
